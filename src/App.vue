@@ -19,9 +19,17 @@
   <table class="table table-hover table-editable" v-if="todos.length">
   <thead>
     <tr>
+      <button class="btn btn-outline-secondary update"
+                type="button" id="updateButton"
+                @click="updateTodo(index)">
+                <span v-if="readonly">Update</span>
+                <span @click="recordsUpdated" v-else>Save</span>
+                <font-awesome-icon icon="edit" />
+      </button>
+    </tr>
+    <tr>
       <th scope="col">#</th>
       <th scope="col">Todo</th>
-      <th scope="col">Update</th>
       <th scope="col">Delete</th>
     </tr>
   </thead>
@@ -32,16 +40,7 @@
         <input :v-model="todos[index]" :name="todoItem + index"
         :id="todoItem + index" :placeholder="todo" v-show="todo" :readonly="readonly"/>
       </td>
-      <td>
-        <button class="btn btn-outline-secondary update"
-                type="button" id="updateButton"
-                @click="updateTodo(index)">
-                <span v-if="readonly">Update</span>
-                <span @click="recordsUpdated" v-else>Save</span>
-
-                <font-awesome-icon icon="edit" />
-        </button>
-      </td>
+      <!-- -->
       <td>
         <button class="btn btn-outline-secondary delete"
         type="button" id="deleteButton" @click="deleteTodo(index)">Delete
@@ -78,6 +77,7 @@ export default {
   methods: {
     addTodo() {
       this.todos.push(this.todo.item);
+      this.readonly = true;
     },
     deleteTodo(i) {
       this.todos.splice(i, 1);
@@ -91,6 +91,17 @@ export default {
         this.updated = false;
       }, 4000);
     },
+  },
+  watch: {
+    todos: {
+      handler() {
+        localStorage.setItem('todos', JSON.stringify(this.todos));
+      },
+      deep: true,
+    },
+  },
+  mounted() {
+    if (localStorage.getItem('todos')) this.todos = JSON.parse(localStorage.getItem('todos'));
   },
 };
 </script>
@@ -109,5 +120,19 @@ body{
 .title {
   text-align: center;
   margin-bottom: 100px;
+}
+::-webkit-input-placeholder { /* WebKit browsers */
+    color:    #000;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+   color:    #000;
+   opacity:  1;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+   color:    #000;
+   opacity:  1;
+}
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+   color:    #000;
 }
 </style>
